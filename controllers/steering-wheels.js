@@ -1,5 +1,5 @@
 
-const { SW } = require('../db/models/steering_wheels');
+const { SW } = require('../db/models/steering-wheels');
 const { ctrlWrapper } = require('../helpers');
 const { mongoose } = require("mongoose");
 
@@ -12,8 +12,8 @@ const getPhotos = async (req, res) => {
 
   try {
 
-      const totalCount = await Recipe.countDocuments();
-      const data = await SW.find().skip(skip).limit(limit).select('_id, name, photo_url, photo_description, material');
+      const totalCount = await SW.countDocuments();
+      const data = await SW.find().skip(skip).limit(limit).select('_id  name photo_url photo_description material');
       res.json(data);
 
   } catch (error) {
@@ -21,8 +21,6 @@ const getPhotos = async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
-
 
 
 module.exports = { getPhotos : ctrlWrapper(getPhotos), }

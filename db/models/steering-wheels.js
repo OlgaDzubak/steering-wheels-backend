@@ -39,6 +39,7 @@ const swSchema = new Schema(
 }
 );
 
-const SW = model('steering_wheel', swSchema); 
+
+const SW = model('swheel', swSchema); 
 
 module.exports = { SW };
