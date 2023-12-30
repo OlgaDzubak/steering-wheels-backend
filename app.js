@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use(express.static('public'));
 
-app.use('', swRouter);
+app.use('steering-wheels', swRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
