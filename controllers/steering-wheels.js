@@ -13,7 +13,7 @@ const getPhotos = async (req, res) => {
   try {
 
       const totalCount = await SW.countDocuments();
-      const data = await SW.find().skip(skip).limit(limit).select('_id  name photo_url photo_description material');
+      const data = await SW.find().skip(skip).limit(limit);
       res.json({ data, totalCount });
 
   } catch (error) {
