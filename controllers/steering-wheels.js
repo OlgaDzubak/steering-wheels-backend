@@ -14,10 +14,9 @@ const getPhotos = async (req, res) => {
 
       const totalCount = await SW.countDocuments();
       const data = await SW.find().skip(skip).limit(limit);
-      res.json({ data, totalCount });
+      res.setHeader('Cache-Control', 'max-age=31557600').json({ data, totalCount });
 
   } catch (error) {
-    
       res.status(500).json({ error: 'Internal Server Error' });
   }
 };
