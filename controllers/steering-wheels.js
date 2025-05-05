@@ -29,7 +29,7 @@ const getCategories = async (req, res) => {
 const getPhotos = async (req, res) => {
   
   const language = req.query.language || 'ua';
-  const category = req.query.category;
+  const category = req.query.category || '';
   const query = {[`name_${language}`] : { $regex: category, $options: 'i' }};
 
   try {
