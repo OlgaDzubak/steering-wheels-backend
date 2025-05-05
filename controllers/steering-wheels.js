@@ -29,10 +29,12 @@ const getCategories = async (req, res) => {
 const getPhotos = async (req, res) => {
   
   const language = req.query.language || 'ua';
-  
+  const category = req.query.category;
+  const query = {[`name_${language}`] : { $regex: category, $options: 'i' }};
+
   try {
     
-    const data = await SW.find({}, {_id: 1, [`photo_description_${language}`]: 1, photo_url: 1, photo_url_small: 1,});
+    const data = await SW.find(query, {_id: 1, [`photo_description_${language}`]: 1, photo_url: 1, photo_url_small: 1,});
     res.setHeader('Cache-Control', 'max-age=31557600').json({ data });
 
   } catch (error) {
