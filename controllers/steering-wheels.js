@@ -1,7 +1,28 @@
 
 const { SW } = require('../db/models/steering-wheels');
 const { ctrlWrapper } = require('../helpers');
-const { mongoose } = require("mongoose");
+//const { mongoose } = require("mongoose");
+
+
+const getCategories = async (req, res) => {
+  
+  const {language} = req.query;
+  
+  try {
+    const resultData = await SW.aggregate([
+                                            { $project: { ["name_" + language]: 1, count: { $add: [1] } } },
+                                            { $unwind: "$name_" + language },
+                                            { $group: { _id: "$name_" + language, number: { $sum: "$count" } } },
+                                            { $sort: {number: -1}},
+                                            { $project: { _id: 0, number: 1, category: "$_id" } }
+                                          ]);
+        res.setHeader('Cache-Control', 'max-age=31557600').json({ data : resultData });
+
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 
 const getPhotos = async (req, res) => {
   
@@ -22,4 +43,8 @@ const getPhotos = async (req, res) => {
 };
 
 
-module.exports = { getPhotos : ctrlWrapper(getPhotos), }
+
+module.exports = {
+  getCategories: ctrlWrapper(getCategories),
+  getPhotos: ctrlWrapper(getPhotos),  
+}
