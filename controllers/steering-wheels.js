@@ -29,27 +29,10 @@ const getCategories = async (req, res) => {
 const getPhotos = async (req, res) => {
   
   const language = req.query.language || 'ua';
-  //const { page, per_page } = req.query;
-  // const currentPage = parseInt(page) || 1;
-  // const limit = parseInt(per_page) || 9;
-  // const skip = (currentPage - 1) * limit;
   
   try {
     
-    //const totalCount = await SW.countDocuments();
-    //const data = await SW.find().skip(skip).limit(limit);
-    //res.setHeader('Cache-Control', 'max-age=31557600').json({ data, totalCount });
-    
-    const data = await SW.find({}, {
-      _id: 1,      
-      [`material_${language}`]: 1,
-      [`photo_description_${language}`]: 1,
-      [`name_${language}`]: 1,
-      photo_url: 1,
-      photo_url_small: 1,
-      car_brand: 1,
-    });
-
+    const data = await SW.find({}, {_id: 1, [`photo_description_${language}`]: 1, photo_url: 1, photo_url_small: 1,});
     res.setHeader('Cache-Control', 'max-age=31557600').json({ data });
 
   } catch (error) {
