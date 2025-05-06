@@ -23,12 +23,7 @@ const getAllCategoriesAndPhotos = async (req, res) => {
       
       const categories = categoriesArray.map(({ category }) => category);
 
-      const data = {
-        categories,
-        photos
-      };     
-      
-      res.setHeader('Cache-Control', 'max-age=31557600').json({ data });
+      res.setHeader('Cache-Control', 'max-age=31557600').json({ categories, photos });
   
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
