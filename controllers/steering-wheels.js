@@ -1,22 +1,55 @@
 
 const { SW } = require('../db/models/steering-wheels');
 const { ctrlWrapper } = require('../helpers');
-//const { mongoose } = require("mongoose");
 
+
+const getAllCategoriesAndPhotos = async (req, res) => {
+  
+    const language = req.query.language || 'ua';
+  
+    try {
+
+      //дістаємо всі категорії
+      const categoriesArray = await SW.aggregate([
+                                              { $project: { ["name_" + language]: 1, count: { $add: [1] } } },
+                                              { $unwind: "$name_" + language },
+                                              { $group: { _id: "$name_" + language, number: { $sum: "$count" } } },
+                                              { $sort: {number: -1}},
+                                              { $project: { _id: 0, category: "$_id" } }
+      ]);
+
+      //дістаємо всі photo
+      const photos = await SW.find({}, {_id: 1, [`photo_description_${language}`]: 1, photo_url: 1, photo_url_small: 1,});
+      
+      const categories = categoriesArray.map(({ category }) => category);
+
+      const data = {
+        categories,
+        photos
+      };     
+      
+      res.setHeader('Cache-Control', 'max-age=31557600').json({ data });
+  
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+}
 
 const getCategories = async (req, res) => {
   
-  const {language} = req.query;
+  const language = req.query.language || 'ua';
   
   try {
-    const resultDataAray = await SW.aggregate([
+    const resultDataArray = await SW.aggregate([
                                             { $project: { ["name_" + language]: 1, count: { $add: [1] } } },
                                             { $unwind: "$name_" + language },
                                             { $group: { _id: "$name_" + language, number: { $sum: "$count" } } },
                                             { $sort: {number: -1}},
                                             { $project: { _id: 0, category: "$_id" } }
     ]);
-    const data =resultDataAray.map(({ category }) => category);
+    
+    const data =resultDataArray.map(({ category }) => category);
     
     res.setHeader('Cache-Control', 'max-age=31557600').json({ data });
 
@@ -45,6 +78,7 @@ const getPhotos = async (req, res) => {
 
 
 module.exports = {
+  getAllCategoriesAndPhotos: ctrlWrapper(getAllCategoriesAndPhotos),
   getCategories: ctrlWrapper(getCategories),
   getPhotos: ctrlWrapper(getPhotos),  
 }
