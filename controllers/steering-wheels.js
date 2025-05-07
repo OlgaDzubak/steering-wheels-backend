@@ -3,9 +3,11 @@ const { SW } = require('../db/models/steering-wheels');
 const { ctrlWrapper } = require('../helpers');
 
 
-const getAllCategoriesAndPhotos = async (req, res) => {
+const getCategoriesAndPhotos = async (req, res) => {
   
     const language = req.query.language || 'ua';
+    const category = req.query.category || '';
+    const query = {[`name_${language}`] : { $regex: category, $options: 'i' }};
   
     try {
 
@@ -19,11 +21,12 @@ const getAllCategoriesAndPhotos = async (req, res) => {
       ]);
 
       //дістаємо всі photo
-      const photos = await SW.find({}, {_id: 1, [`photo_description_${language}`]: 1, photo_url: 1, photo_url_small: 1,});
+      const photos = await SW.find(query, {_id: 1, [`photo_description_${language}`]: 1, photo_url: 1, photo_url_small: 1,});
       
       const categories = categoriesArray.map(({ category }) => category);
 
-      res.setHeader('Cache-Control', 'max-age=31557600').json({ categories, photos });
+      //повертаємо такі дані: всі категорії, обрану категорію та фото обраної категорії
+      res.setHeader('Cache-Control', 'max-age=31557600').json({ categories, category , photos });
   
     } catch (error) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -73,7 +76,7 @@ const getPhotos = async (req, res) => {
 
 
 module.exports = {
-  getAllCategoriesAndPhotos: ctrlWrapper(getAllCategoriesAndPhotos),
+  getCategoriesAndPhotos: ctrlWrapper(getCategoriesAndPhotos),
   getCategories: ctrlWrapper(getCategories),
   getPhotos: ctrlWrapper(getPhotos),  
 }
